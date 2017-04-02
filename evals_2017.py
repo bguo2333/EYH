@@ -21,16 +21,34 @@ def getFracs(toFrac):
         
         counter = collections.Counter(questioninfo)
                 
-        for key in counter.keys():
-            ind = counter.keys().index(key)
-            fracs[key] = round(float(counter.values()[ind])/total * 100,1)       
+        # for key in counter.keys():
+        #     ind = counter.keys().index(key)
+        #     fracs[key] = round(float(counter.values()[ind])/total * 100,1)       
         
+        #print question
+        #print counter.keys()
+
+        for i in range(1,6):
+        	#print "index " + str(i)
+        	#print "counter " + str(counter[i])
+        	if i not in counter.keys():
+        		fracs[i]=0
+        	else:
+        		ind = counter.keys().index(i)
+        		fracs[i] = round(float(counter.values()[ind])/total * 100, 1)
+
+
+
+
+
         final[question] = fracs
+        #print fracs
           
     return final
 
 
-
+def my_autopct(pct):
+    return ('%1.1f' % pct + '%') if pct > .01 else ''
 
 
 
@@ -95,32 +113,32 @@ if __name__ == '__main__':
 			#this should be in a loop but I cant for the life of me figure out how
 
 			question = "I felt comfortable asking questions at the workshop."
-			ax1.pie(fracs[question].values(),autopct='%1.1f%%')
+			ax1.pie(fracs[question].values(),autopct=my_autopct)
 			ax1.set_title("I felt comfortable asking \n questions at the workshop.", fontsize=11,color='k')
 			ax1.axis('equal')
 			#plt.legend(evals.values(),loc="best")
 
 			question = "I enjoyed the workshop and learned something interesting."
-			ax2.pie(fracs[question].values(),autopct='%1.1f%%')
+			ax2.pie(fracs[question].values(),autopct=my_autopct)
 			ax2.set_title("I enjoyed the workshop and \n learned something interesting.", fontsize=11,color='k')
 			ax2.axis('equal')
 			#plt.legend(evals.values(),loc="best")
 
 			question = "I think I would enjoy the workshop leaders' job."
-			ax3.pie(fracs[question].values(),autopct='%1.1f%%')
+			ax3.pie(fracs[question].values(),autopct=my_autopct)
 			#ax3.set_title("I think I would enjoy the \n workshop leaders' job.")
 			ax3.set_title("I think I would enjoy the workshop leaders' job.", fontsize=11,color='k')
 			ax3.axis('equal')
 			#plt.legend(evals.values(),loc="best")
 
 			question = "The workshop made me feel like I can have a job in science, engineering or math."
-			ax4.pie(fracs[question].values(),autopct='%1.1f%%')
+			ax4.pie(fracs[question].values(),autopct=my_autopct)
 			ax4.set_title("The workshop made me feel like I can \n have a job in science, engineering or math.",fontsize=11,color='k')
 			ax4.axis('equal')
 			#plt.legend(evals.values(),loc="best")
 
 			question = "I enjoyed listening to my workshop leader give their presentation."
-			ax5.pie(fracs[question].values(),autopct='%1.1f%%')
+			ax5.pie(fracs[question].values(),autopct=my_autopct)
 			ax5.set_title("I enjoyed listening to my workshop \n leader give their presentation.",fontsize=11,color='k')
 			ax5.axis('equal')
 			#plt.legend(evals.values(),loc="best"
