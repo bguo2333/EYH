@@ -149,13 +149,13 @@ if __name__ == '__main__':
 
 			#out_comments = formatComments(Comments)
 			x_init = 0
-			y_init = 1
+			y_init = 1.08
 			x = x_init
 			y = y_init
 			plt.axis('off')
 			for comment in Comments:
 				if len(comment):
-					y -= .05
+					y -= .08
 					plt.text(x ,y ,comment, horizontalalignment='left',verticalalignment='top', fontsize=12, wrap=True,color='k')
 
 			pp.savefig()
