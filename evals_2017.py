@@ -19,37 +19,22 @@ def getFracs(toFrac):
         questioninfo = toFrac[question]
         total = len(questioninfo)
         
-        counter = collections.Counter(questioninfo)
-                
-        # for key in counter.keys():
-        #     ind = counter.keys().index(key)
-        #     fracs[key] = round(float(counter.values()[ind])/total * 100,1)       
-        
-        #print question
-        #print counter.keys()
+        counter = collections.Counter(questioninfo)  #gets number of each element    
 
         for i in range(1,6):
-        	#print "index " + str(i)
-        	#print "counter " + str(counter[i])
-        	if i not in counter.keys():
+        	if i not in counter.keys():   #if none of element, return zero (fixes colors for pie chart)
         		fracs[i]=0
         	else:
         		ind = counter.keys().index(i)
         		fracs[i] = round(float(counter.values()[ind])/total * 100, 1)
 
-
-
-
-
         final[question] = fracs
-        #print fracs
           
     return final
 
 
-def my_autopct(pct):
+def my_autopct(pct):  #formatting percent show, don't show 0%
     return ('%1.1f' % pct + '%') if pct > .01 else ''
-
 
 
 
@@ -145,7 +130,9 @@ if __name__ == '__main__':
 
 			plt.rcParams['text.color'] = 'k'
 			pie = ax6.pie([1,1,1,1,1], labels=evals.values())
-			l = ax6.legend(loc="center",prop={'size':14})
+			handles, labels = ax6.get_legend_handles_labels()
+			l = ax6.legend(handles[::-1], labels[::-1],loc="center",prop={'size':14}) #beginning reverses order of legend
+			#l = ax6.legend(loc="center",prop={'size':14})
 			ax6.axis('equal')
 			for group in pie:
 				for x in group:
