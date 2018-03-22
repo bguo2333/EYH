@@ -12,16 +12,23 @@ dat = dat[['FirstName','LastName','FirstChoice','SecondChoice','ThirdChoice']]
 buddy_df = pd.read_csv('2018Volunteers.csv')
 buddy_df = buddy_df[['FirstName','LastName']]
 
-#dat.drop(['Timestamp', 'Email Address', 'Parent ', 'ParentNumber', 'ParentEmail', 'School', 'Grade', 'PreviousEYH', 'YearEYH', 'Marketing', 'Shirt', 'Access', 'Allergies', 'Payment', 'WhyWaiver', 'Photorelease', 'Waiver'], axis=1, inplace=True)
-
+b = []
+for index, row in buddy_df.iterrows():
+	b.append(row['FirstName'] + " " + row['LastName'])
 
 nTracks = 8
 maxGirls = 12
 almostgirls = 11
 girlBuddies = 6
+
 tracks = { "Track %i"%(x+1):{1:[], 2:[], 3:[]} for x in range(nTracks)}
+buddies = { "Track %i"%(x+1):{1:[ b[6*x], b[6*x+1] ], 2:[ b[6*x+2], b[6*x+3] ], 3:[ b[6*x+4], b[6*x+5] ]} for x in range(nTracks)}
 full = { "Track %i"%(x+1):False for x in range(nTracks)}
 almostfull = { "Track %i"%(x+1):False for x in range(nTracks)}
+
+
+
+
 choices = ['First','Second','Third']
 unmatched = []
 
@@ -35,9 +42,7 @@ workshops = {
 	"Track 7": ["Plantastic! The Wonderful World of Plants", "Made You Look!", "Escape Room: Code Your Way Out!"],
 	"Track 8": ["Lucy and the 3D Printer", "Becoming a Natural with Natural Products", "Housing Hijinks"]}
 
-print tracks
 
-print len(dat)
 
 ########################
 #print first choices
@@ -55,7 +60,6 @@ girlsInTracks = 0
 
 for index, row in dat.iterrows():
 
-	print row
 	
 	if pd.isnull(row['FirstName']) :
 		continue
@@ -75,22 +79,20 @@ for index, row in dat.iterrows():
 	
 
 	if ideal == "NOMATCH":
-		unmatched.append(row['FirstName']+ ", " + row['LastName'] + " \n")
+		unmatched.append(row['FirstName']+ ", " + row['LastName'])
 		continue
 
 	smallest = min( tracks[ideal], key=lambda k: len(tracks[ideal][k]))
-	tracks[ideal][smallest].append(row['LastName']+ ", " + row['FirstName'] + " \n")
+	tracks[ideal][smallest].append(row['LastName']+ ", " + row['FirstName'])
 	
 	if len(tracks[ideal][1]) == len(tracks[ideal][2]) == len(tracks[ideal][3]) == almostgirls:
 		almostfull[ideal] = True
 	if len(tracks[ideal][1]) == len(tracks[ideal][2]) == len(tracks[ideal][3]) == maxGirls:
 		full[ideal] = True
 
-print "printing unmatched"
 
 #this big to do to make sure that everything is evenly distributed
 for name in unmatched:
-	print name
 	found = False
 	smalls = []
 	for track in tracks:
@@ -116,18 +118,12 @@ for name in unmatched:
 
 
 
-#assign buddies, probably a smarter way to do this but I am tired
-
-
 
 ####################
 
-print 
-print
 
 print "Unmatched girls " + str(len(unmatched))
 print unmatched
-print
 
 
 rots = [ [1,2,3],
@@ -136,7 +132,16 @@ rots = [ [1,2,3],
 
 
 #print tracks
- 
+
+partners={}
+
+#make buddy assignments
+for track in tracks:
+	for x in xrange(3):
+		partners[ buddies[track][x+1][0] ] = {"girls":tracks[track][x+1][0:5], "firstWorkshop": workshops[track][x], "track": track}
+		partners[ buddies[track][x+1][1] ] = {"girls":tracks[track][x+1][5:], "firstWorkshop": workshops[track][x], "track": track}
+
+
 for track in tracks:
 	for x in xrange(3):
 		csv_name = "Rosters/leaderRosters/" + workshops[track][x] + ".csv"
@@ -144,24 +149,50 @@ for track in tracks:
 		title = "Last Name, First Name, Buddy Name \n"
 		csv.write(title)
 
-		print "track " + track + " group " + str(x) + " with " +  str(len(tracks[track][x+1]))
+		print track + " group " + str(x) + " with " +  str(len(tracks[track][x+1]))
 		girlsInTracks += len(tracks[track][x+1])
+		
+		
 		for rot in rots[x]:
 			csv.write(" , \n")
 			csv.write(" , \n")
 			for name in tracks[track][rot]:
-				csv.write(name)
+				buddyName = ""
+				for bud in partners:
+					if name in partners[bud]["girls"]:
+						buddyName = bud
+				csv.write(name + " ," + buddyName + " \n")
+
+
 
 print "total girls ", totalGirls
 print "girls in tracks ", girlsInTracks
 
+
+for bud in partners:
+	csv_name = "Rosters/buddyRosters/" + bud + ".csv"
+	csv = open(csv_name, "w")
+	title = "Last Name, First Name \n"
+	csv.write(title)
+	csv.write(" , \n")
+	csv.write( partners[bud]["firstWorkshop"] +", "+ partners[bud]["track"] + " \n")
+	csv.write(" , \n")
+	for name in partners[bud]["girls"]:
+		csv.write(name + " \n")
+
+
 csv_name = "Rosters/Master.csv"
 csv = open(csv_name,"w")
-title = "Track, First Workshop, Last Name, First Name \n"
+title = "Track, First Workshop, Last Name, First Name, Buddy Name \n"
+csv.write(title)
 for track in tracks:
 	for rot in tracks[track]:
 		for name in tracks[track][rot]:
-			row = track + " ," + workshops[track][rot-1] + " ," + name
+			buddyName = ""
+			for bud in partners:
+				if name in partners[bud]["girls"]:
+					buddyName = bud
+			row = track + " ," + workshops[track][rot-1] + " ," + name + " ,"+ buddyName + " \n"
 			csv.write(row)
 
 
