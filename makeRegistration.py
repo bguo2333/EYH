@@ -5,10 +5,20 @@ import sys
 import matplotlib.pyplot as plt
 
 
+def getBuddyName(name):
+	for bud in partners:
+		if name in partners[bud]["girls"]:
+			buddyName = bud
+	return buddyName
 
+
+
+
+#girls registration
 dat = pd.read_csv('Registration2018.csv')
 dat = dat[['FirstName','LastName','FirstChoice','SecondChoice','ThirdChoice']]
 
+#buddy registration
 buddy_df = pd.read_csv('2018Volunteers.csv')
 buddy_df = buddy_df[['FirstName','LastName']]
 
@@ -17,7 +27,6 @@ for index, row in buddy_df.iterrows():
 	b.append(row['FirstName'] + " " + row['LastName'])
 
 nTracks = 8
-dumb = ['a','b','c','d','e','f']
 maxGirls = 12
 almostgirls = 11
 girlBuddies = 6
@@ -26,6 +35,7 @@ tracks = { "Track %i"%(x+1):{1:[], 2:[], 3:[]} for x in range(nTracks)}
 buddies = { "Track %i"%(x+1):{1:[ b[6*x], b[6*x+1] ], 2:[ b[6*x+2], b[6*x+3] ], 3:[ b[6*x+4], b[6*x+5] ]} for x in range(nTracks)}
 full = { "Track %i"%(x+1):False for x in range(nTracks)}
 almostfull = { "Track %i"%(x+1):False for x in range(nTracks)}
+dumb = ['a','b','c','d','e','f']
 
 
 
@@ -59,6 +69,7 @@ for choice in choices:
 totalGirls = 0
 girlsInTracks = 0
 
+#put the girls into tracks
 for index, row in dat.iterrows():
 
 	
@@ -92,10 +103,12 @@ for index, row in dat.iterrows():
 		full[ideal] = True
 
 
-#this big to do to make sure that everything is evenly distributed
+#this big to do to make sure that everything is evenly distributed, these girls who registered late are assigned at relative random, can maybe do this smarter
 for name in unmatched:
 	found = False
 	smalls = []
+
+	#fill all the ones that are not close to full first
 	for track in tracks:
 		if not almostfull[track] and not found:
 			smallest = min ( tracks[track], key=lambda k: len(tracks[track][k]))
@@ -106,6 +119,7 @@ for name in unmatched:
 			if len(tracks[track][1]) == len(tracks[track][2]) == len(tracks[track][3]) == almostgirls:
 				almostfull[track] = True
 			break
+	#then fill em up
 	if not found:
 		for track in tracks:
 			if not full[track] and not found:
@@ -145,7 +159,7 @@ for track in tracks:
 		
 
 
-
+#rosters for leaders
 for track in tracks:
 	for x in xrange(3):
 		csv_name = "Rosters/leaderRosters/" + workshops[track][x] + ".csv"
@@ -163,10 +177,7 @@ for track in tracks:
 			csv.write(" , \n")
 			csv.write(" , \n")
 			for name in tracks[track][rot]:
-				buddyName = ""
-				for bud in partners:
-					if name in partners[bud]["girls"]:
-						buddyName = bud
+				buddyName = getBuddyName(name)
 
 				
 				csv.write(name + " ," + buddyName + "," + partners[buddyName]["id"] + " \n")
@@ -207,7 +218,7 @@ for bud in partners:
 
 
 
-
+#master roster
 csv_name = "Rosters/Master.csv"
 csv = open(csv_name,"w")
 title = "Track, Last Name, First Name, Buddy Name, Buddy ID, First Workshop, Second Workshop, Third Workshop \n"
@@ -215,10 +226,7 @@ csv.write(title)
 for track in tracks:
 	for rot in tracks[track]:
 		for name in tracks[track][rot]:
-			buddyName = ""
-			for bud in partners:
-				if name in partners[bud]["girls"]:
-					buddyName = bud
+			buddyName = getBuddyName(name)
 			row = track + " ," + name + " ,"+ buddyName + ", " + partners[buddyName]["id"] + "," + partners[buddyName]["firstWorkshop"] + " , " + partners[buddyName]["secondWorkshop"] + " , "+partners[buddyName]["thirdWorkshop"]+" \n"
 			csv.write(row)
 
