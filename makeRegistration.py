@@ -17,6 +17,7 @@ for index, row in buddy_df.iterrows():
 	b.append(row['FirstName'] + " " + row['LastName'])
 
 nTracks = 8
+dumb = ['a','b','c','d','e','f']
 maxGirls = 12
 almostgirls = 11
 girlBuddies = 6
@@ -131,6 +132,7 @@ rots = [ [1,2,3],
 	 [3,2,1]]
 
 
+
 #print tracks
 
 partners={}
@@ -138,8 +140,8 @@ partners={}
 #make buddy assignments
 for track in tracks:
 	for x in xrange(3):
-		partners[ buddies[track][x+1][0] ] = {"girls":tracks[track][x+1][0:5], "firstWorkshop": workshops[track][x], "secondWorkshop":workshops[track][rots[x][1]-1], "thirdWorkshop":workshops[track][rots[x][2] -1],"track": track}
-		partners[ buddies[track][x+1][1] ] = {"girls":tracks[track][x+1][5:], "firstWorkshop": workshops[track][x], "secondWorkshop": workshops[track][rots[x][1]-1 ], "thirdWorkshop":workshops[track][rots[x][2] -1 ], "track": track}
+		partners[ buddies[track][x+1][0] ] = {"girls":tracks[track][x+1][0:5], "firstWorkshop": workshops[track][x], "secondWorkshop":workshops[track][rots[x][1]-1], "thirdWorkshop":workshops[track][rots[x][2] -1],"track": track, "id":str(track.strip("Track ")) + dumb[2*x]}
+		partners[ buddies[track][x+1][1] ] = {"girls":tracks[track][x+1][5:], "firstWorkshop": workshops[track][x], "secondWorkshop": workshops[track][rots[x][1]-1 ], "thirdWorkshop":workshops[track][rots[x][2] -1 ], "track": track, "id":str(track.strip("Track "))+dumb[2*x+1]}
 		
 
 
@@ -150,7 +152,7 @@ for track in tracks:
 		csv = open(csv_name, "w")
 		csv.write( workshops[track][x] + ", \n")
 		csv.write(" , \n")
-		title = "Last Name, First Name, Buddy Name \n"
+		title = "Last Name, First Name, Buddy Name, BuddyID \n"
 		csv.write(title)
 		
 		print track + " group " + str(x) + " with " +  str(len(tracks[track][x+1]))
@@ -167,7 +169,7 @@ for track in tracks:
 						buddyName = bud
 
 				
-				csv.write(name + " ," + buddyName + " \n")
+				csv.write(name + " ," + buddyName + "," + partners[buddyName]["id"] + " \n")
 
 
 print "total girls ", totalGirls
@@ -178,17 +180,18 @@ print "girls in tracks ", girlsInTracks
 #list of buddies with track and workshops
 csv_name = "Rosters/buddylist.csv"
 csv = open(csv_name, "w")
-title = "Name, Track, First Workshop, Second Workshop, Third Workshop"
+title = "Buddy ID, Name, Track, First Workshop, Second Workshop, Third Workshop"
 csv.write(title)
 csv.write(" , \n")
 for bud in partners:
-	csv.write( bud +  " , " + partners[bud]["track"] + " ," + partners[bud]["firstWorkshop"] + "," + partners[bud]["secondWorkshop"] + "," + partners[bud]["thirdWorkshop"] + "\n")
+	csv.write( partners[bud]["id"] + "," + bud +  " , " + partners[bud]["track"] + " ," + partners[bud]["firstWorkshop"] + "," + partners[bud]["secondWorkshop"] + "," + partners[bud]["thirdWorkshop"] + "\n")
 
 
 #rosters for buddies
 for bud in partners:
-	csv_name = "Rosters/buddyRosters/" + bud + ".csv"
+	csv_name = "Rosters/buddyRosters/" +partners[bud]["id"] + "_"+ bud + ".csv"
 	csv = open(csv_name, "w")
+	csv.write(partners[bud]["id"])
 	csv.write(bud + ", \n")
 	csv.write(" , \n")
 	title = "Last Name, First Name \n"
@@ -207,7 +210,7 @@ for bud in partners:
 
 csv_name = "Rosters/Master.csv"
 csv = open(csv_name,"w")
-title = "Track, Last Name, First Name, Buddy Name, First Workshop, Second Workshop, Third Workshop \n"
+title = "Track, Last Name, First Name, Buddy Name, Buddy ID, First Workshop, Second Workshop, Third Workshop \n"
 csv.write(title)
 for track in tracks:
 	for rot in tracks[track]:
@@ -216,7 +219,7 @@ for track in tracks:
 			for bud in partners:
 				if name in partners[bud]["girls"]:
 					buddyName = bud
-			row = track + " ," + name + " ,"+ buddyName + ", " + partners[buddyName]["firstWorkshop"] + " , " + partners[buddyName]["secondWorkshop"] + " , "+partners[buddyName]["thirdWorkshop"]+" \n"
+			row = track + " ," + name + " ,"+ buddyName + ", " + partners[buddyName]["id"] + "," + partners[buddyName]["firstWorkshop"] + " , " + partners[buddyName]["secondWorkshop"] + " , "+partners[buddyName]["thirdWorkshop"]+" \n"
 			csv.write(row)
 
 
