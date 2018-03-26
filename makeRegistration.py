@@ -91,7 +91,7 @@ for index, row in dat.iterrows():
 	
 
 	if ideal == "NOMATCH":
-		unmatched.append(row['FirstName']+ ", " + row['LastName'])
+		unmatched.append(row['LastName']+ ", " + row['FirstName'])
 		continue
 
 	smallest = min( tracks[ideal], key=lambda k: len(tracks[ideal][k]))
@@ -108,7 +108,7 @@ for name in unmatched:
 	found = False
 	smalls = []
 
-	#fill all the ones that are not close to full first
+	#fill all the ones that are not close to full first, in the future can probably check if their first choice is not full first, but I was tired and didn't think of it in time
 	for track in tracks:
 		if not almostfull[track] and not found:
 			smallest = min ( tracks[track], key=lambda k: len(tracks[track][k]))
